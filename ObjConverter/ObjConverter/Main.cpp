@@ -3,10 +3,48 @@
 #include <sstream>
 #include <vector>
 #include <GL\glew.h>
+#include <Windows.h>
+
+const wchar_t *GetWC(const char *c)
+{
+	const size_t cSize = strlen(c) + 1;
+	wchar_t* wc = new wchar_t[cSize];
+	mbstowcs(wc, c, cSize);
+
+	return wc;
+}
+
+/* Returns a list of files in a directory (except the ones that begin with a dot) */
+void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory)
+{
+	HANDLE dir;
+	WIN32_FIND_DATA file_data;
+	 
+	if ((dir = FindFirstFile(GetWC((directory + "/*").c_str()), &file_data)) == INVALID_HANDLE_VALUE)
+		return; /* No files found */
+
+	do {
+		char ch[260];
+		char defChar = ' ';
+		WideCharToMultiByte(CP_ACP, 0, file_data.cFileName, -1, ch, 260, &defChar, NULL);
+		const std::string file_name(ch);
+		const bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+		if (file_name[0] == '.')
+			continue;
+
+		if (is_directory)
+			continue;
+
+		out.push_back(file_name);
+	} while (FindNextFile(dir, &file_data));
+
+	FindClose(dir);
+} // GetFilesInDirectory
 
 bool convertFile(const std::string &fileName)
 {
-	std::ifstream in(fileName, std::ios::in);
+	std::ifstream in("./obj/" + fileName, std::ios::in);
 	std::vector<GLfloat> objData;
 	std::vector<GLfloat> vertices;
 	std::vector<GLfloat> uvs;
@@ -178,6 +216,7 @@ bool convertFile(const std::string &fileName)
 	}
 
 	std::string newFile(fileName);
+	newFile = "./bmf/" + newFile;
 	newFile.pop_back();
 	newFile.pop_back();
 	newFile.pop_back();
@@ -186,25 +225,49 @@ bool convertFile(const std::string &fileName)
 	FILE *binaryFile = nullptr;
 	fopen_s(&binaryFile, newFile.c_str(), "wb");
 
-	fwrite(&objData[0], sizeof(GLfloat), objData.size(), binaryFile);
+	unsigned int size = 0;
+	size = objData.size();
+	fwrite(&size, sizeof(unsigned int), 1, binaryFile);
+
+	fwrite(&objData[0], sizeof(GLfloat), size, binaryFile);
 
 	fclose(binaryFile);
+	
+	return true;
+}
+
+bool hasEnding(std::string const &fullString, std::string const &ending)
+{
+	if (fullString.length() >= ending.length()) {
+		return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+	}
+	else {
+		return false;
+	}
 }
 
 int main()
 {
-	std::cout << "Path of OBJ file? ";
+	std::vector<std::string> files;
 
-	std::string fileName;
+	GetFilesInDirectory(files, "./obj");
 
-	std::cin >> fileName;
-
-	if (convertFile(fileName))
+	for (auto it = files.begin(); it != files.end(); it++)
 	{
-		return 0;
+		if (hasEnding((*it), ".obj"))
+		{
+			std::cout << "Converting " << (*it) << " to BMF format..." << std::endl;
+
+				if (convertFile((*it)))
+				{
+					std::cout << "Successfully converted file " << (*it) << std::endl << std::endl;
+				}
+				else
+				{
+					std::cout << "Error converting file " << (*it) << std::endl << std::endl;
+				}
+		}
 	}
-	else
-	{
-		return 1;
-	}
+
+	system("pause");
 }
