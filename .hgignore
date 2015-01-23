@@ -1,0 +1,8 @@
+syntax: glob
+ObjConverter/Debug/ObjConverter.exe
+ObjConverter/Debug/ObjConverter.ilk
+ObjConverter/Debug/ObjConverter.pdb
+ObjConverter/ObjConverter.sdf
+ObjConverter/ObjConverter.v12.suo
+ObjConverter/ObjConverter/Debug/*
+ObjConverter/ObjConverter/bmf/*
