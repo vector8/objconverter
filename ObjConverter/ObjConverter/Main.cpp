@@ -76,13 +76,15 @@ bool convertFile(const std::string &fileName)
 					std::cin >> response;
 					if (response == 'y')
 					{
-						continue;
+						break;
 					}
 					else if (response == 'n')
 					{
 						return false;
 					}
 				}
+
+				continue;
 			}
 
 			vertices.push_back(x);
@@ -105,13 +107,15 @@ bool convertFile(const std::string &fileName)
 					std::cin >> response;
 					if (response == 'y')
 					{
-						continue;
+						break;
 					}
 					else if (response == 'n')
 					{
 						return false;
 					}
 				}
+
+				continue;
 			}
 
 			uvs.push_back(u);
@@ -134,13 +138,15 @@ bool convertFile(const std::string &fileName)
 					std::cin >> response;
 					if (response == 'y')
 					{
-						continue;
+						break;
 					}
 					else if (response == 'n')
 					{
 						return false;
 					}
 				}
+
+				continue;
 			}
 
 			normals.push_back(x);
@@ -164,13 +170,15 @@ bool convertFile(const std::string &fileName)
 					std::cin >> response;
 					if (response == 'y')
 					{
-						continue;
+						break;
 					}
 					else if (response == 'n')
 					{
 						return false;
 					}
 				}
+
+				continue;
 			}
 
 			v1v--;
